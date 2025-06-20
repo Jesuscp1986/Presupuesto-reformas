@@ -1,0 +1,79 @@
+import streamlit as st
+
+# Lista de partidas con precios base
+PARTIDAS = {
+    "desescombro": 20,
+    "alicatado": 45,
+    "fontanería": 80,
+    "montaje sanitario/mueble": 80,
+    "montaje mampara": 120,
+    "techo pladur": 38,
+    "solería": 48,
+    "pintura techo": 100,
+    "pintura metro": 8,
+    "tarima": 15,
+    "colocación puertas": 120,
+    "premarcos": 120,
+    "pladur paredes": 38,
+    "tabique": 48,
+    "tabiques lineales": 38,
+    "placa verde": 3,
+    "ladrillo hueco": 60,
+    "perlita": 18,
+    "colocar lámparas": 25,
+    "ventilador": 60,
+    "termos eléctrico": 130,
+    "termos gas ciudad": 180,
+}
+
+def calcula_presupuesto(descripcion, metros, bidet=False, bañera=True):
+    total = 0
+    detalles = []
+
+    # Ejemplo sencillo basado en descripción y opciones
+    if "baño" in descripcion.lower():
+        detalles.append(f"Desescombro: {PARTIDAS['desescombro']} €/m2 x {metros} m2")
+        total += PARTIDAS['desescombro'] * metros
+
+        detalles.append(f"Alicatado (sin material): {PARTIDAS['alicatado']} €/m2 x {metros} m2")
+        total += PARTIDAS['alicatado'] * metros
+
+        detalles.append(f"Fontanería: {PARTIDAS['fontanería']} € punto")
+        total += PARTIDAS['fontanería'] * 4  # supongamos 4 puntos básicos
+
+        if bañera:
+            detalles.append("Montaje sanitarios/mueble: mínimo 300 € por baño")
+            total += 300
+        else:
+            detalles.append(f"Montaje sanitarios/mueble: {PARTIDAS['montaje sanitario/mueble']} € x 3 unidades")
+            total += PARTIDAS['montaje sanitario/mueble'] * 3
+
+        if bidet:
+            detalles.append("Incluye bidet: +80 €")
+            total += 80
+
+        detalles.append(f"Pintura techo: {PARTIDAS['pintura techo']} €")
+        total += PARTIDAS['pintura techo']
+
+    else:
+        detalles.append("Descripción no reconocida, calcular manualmente.")
+
+    return total, detalles
+
+st.title("Presupuesto Reformas")
+
+descripcion = st.text_input("Describe la reforma (ejemplo: baño 4 m2, ducha sin bidet)")
+
+metros = st.number_input("Metros cuadrados", min_value=0.0, step=0.1)
+
+bidet = st.checkbox("Incluye bidet")
+
+bañera = st.checkbox("Incluye bañera", value=True)
+
+if st.button("Calcular presupuesto"):
+    total, detalles = calcula_presupuesto(descripcion, metros, bidet, bañera)
+
+    st.subheader("Detalle del presupuesto")
+    for d in detalles:
+        st.write(d)
+    st.subheader(f"Total estimado: {total:.2f} €")
